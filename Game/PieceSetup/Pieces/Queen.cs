@@ -1,3 +1,4 @@
+using System;
 using Chess.Game.PieceSetup;
 
 namespace Chess.Game.PieceSetup.Pieces;

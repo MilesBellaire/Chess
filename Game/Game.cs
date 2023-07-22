@@ -17,12 +17,10 @@ class Game {
         Turn = ColorEnum.White;
         Turns = 0;
 
-        Board[4,6] = new Pawn(ColorEnum.White, 4,6);
-        Board[5,1] = new Pawn(ColorEnum.Black, 5,1);
-        
-        Go(Board[5,1]!, 5,3);
-        Go(Board[5,3]!, 5,4);
-        Go(Board[4,6]!, 4,4);
+        Board[4,0] = new King(ColorEnum.White, 4,0);
+        Board[7,0] = new Rook(ColorEnum.White, 0,0);
+
+        Go(Board[4,0]!, 6,0);
 
         // BaseBoard();
         // Initialize Pieces List
@@ -40,7 +38,7 @@ class Game {
         if(CheckCastle(p,x,y)) {                                                     
             int dir = x-p.X > 0 ? 1 : -1, corner = dir > 1 ? 7 : 0;
             Rook r = (Rook)Board[corner,y]!;
-            Move rookMove = new Move(Turns, x-dir, y);
+            Move rookMove = new(Turns, x-dir, y);
 
             Board[x-dir, y] = r; Board[corner, y] = null; r.Move(rookMove);     // Moves Rook to new position
         }

@@ -1,8 +1,5 @@
 ToDo
-- Make function to calculate if king can castle
-    - Connect that function to CheckMove and CheckMove 
-- Implement Promoting
-- Test EnPassant, Castling, Promoting, All Piece Movements
+- Test Castling, Promoting, All Piece Movements
 - Make UI
 
 In the future...

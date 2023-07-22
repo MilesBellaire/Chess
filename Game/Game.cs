@@ -1,6 +1,8 @@
+using System;
 using Chess.Game.PieceSetup;
 using Chess.Game.PieceSetup.Pieces;
 using Chess.Game.DataStorage;
+using System.Collections.Generic;
 
 namespace Chess.Game;
 
@@ -18,7 +20,7 @@ class Game {
         Turns = 0;
 
         Board[4,0] = new King(ColorEnum.White, 4,0);
-        Board[7,0] = new Rook(ColorEnum.White, 0,0);
+        Board[7,0] = new Rook(ColorEnum.White, 7,0);
 
         Go(Board[4,0]!, 6,0);
 

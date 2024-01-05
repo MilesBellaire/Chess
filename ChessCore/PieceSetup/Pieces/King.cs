@@ -1,8 +1,8 @@
-using Chess.Game.PieceSetup;
+using ChessCore.PieceSetup;
 
-namespace Chess.Game.PieceSetup.Pieces;
+namespace ChessCore.PieceSetup.Pieces;
 
-class King : APiece
+public class King : APiece
 {
     private static int BlackCount;
     private static int WhiteCount;
@@ -12,6 +12,7 @@ class King : APiece
         Id = color == ColorEnum.White ? ++WhiteCount : ++BlackCount;
         Name = PieceEnum.King;
     }
+    public King(ColorEnum color) : this(color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         if(x > 7 || x < 0 || y < 0 || y > 7) return false;

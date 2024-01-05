@@ -1,6 +1,6 @@
-namespace Chess.Game.PieceSetup;
+namespace ChessCore.PieceSetup;
 
-enum PieceEnum {
+public enum PieceEnum {
     Pawn,
     Rook,
     Knight,

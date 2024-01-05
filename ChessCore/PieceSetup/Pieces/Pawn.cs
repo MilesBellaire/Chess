@@ -1,9 +1,9 @@
-using Chess.Game.DataStorage;
-using Chess.Game.PieceSetup;
+using ChessCore.DataStorage;
+using ChessCore.PieceSetup;
 
-namespace Chess.Game.PieceSetup.Pieces;
+namespace ChessCore.PieceSetup.Pieces;
 
-class Pawn : APiece
+public class Pawn : APiece
 {
     private static int BlackCount;
     private static int WhiteCount;
@@ -14,6 +14,8 @@ class Pawn : APiece
         Id = color == ColorEnum.White ? ++WhiteCount : ++BlackCount;
         Name = PieceEnum.Pawn;
     }
+    
+    public Pawn(ColorEnum color) : this(color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         int dir = Color == ColorEnum.Black ? 1 : -1;

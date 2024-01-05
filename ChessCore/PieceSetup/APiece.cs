@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System;
-using Chess.Game.DataStorage;
+using ChessCore.DataStorage;
 
-namespace Chess.Game.PieceSetup;
+namespace ChessCore.PieceSetup;
 
-class APiece {
+public class APiece {
     public int Id;
     public ColorEnum Color;
     public PieceEnum Name;
@@ -44,6 +44,10 @@ class APiece {
         X = move.X;
         Y = move.Y;
 
+    }
+    
+    public override string ToString() {
+        return Color + " " + Name + " " + X + " " + Y;
     }
 
 }

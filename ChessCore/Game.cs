@@ -1,28 +1,25 @@
 using System;
-using Chess.Game.PieceSetup;
-using Chess.Game.PieceSetup.Pieces;
-using Chess.Game.DataStorage;
+using ChessCore.PieceSetup;
+using ChessCore.PieceSetup.Pieces;
+using ChessCore.DataStorage;
 using System.Collections.Generic;
 
-namespace Chess.Game;
+namespace ChessCore;
 
-class Game {
+public class Game {
     public APiece?[,] Board;
     private List<APiece> Pieces;
     private ColorEnum Turn;
     private int Turns;
-
-    public Game() 
+    
+    
+    public Game(APiece?[,] board)
     {
-        Board = new APiece[8,8];
         Pieces = new List<APiece>();
         Turn = ColorEnum.White;
         Turns = 0;
 
-        Board[4,0] = new King(ColorEnum.White, 4,0);
-        Board[7,0] = new Rook(ColorEnum.White, 7,0);
-
-        Go(Board[4,0]!, 6,0);
+        Board = board;
 
         // BaseBoard();
         // Initialize Pieces List
@@ -30,15 +27,33 @@ class Game {
             if(p != null)
                 Pieces.Add(p);
 
+        int currentId = 0;
+        for (int y = 0; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                if (Board[x, y] != null)
+                {
+                    Board[x, y]!.X = x;
+                    Board[x, y]!.Y = y;
+
+                    currentId++;
+                }
+            }
+        }
+
         GetAttackedSpaces();
     }
-    public bool Go(APiece p, int x, int y) 
+    public Game() : this(BaseBoard()) {}
+    
+    public bool Go(APiece? p, int x, int y) 
     {
+        if(p is null || Pieces.Contains(p) || p.Color != Turn) return false;
         // Handle conditions before moving piece
         if(!CheckMove(p, x, y)) return false;
         
         if(CheckCastle(p,x,y)) {                                                     
-            int dir = x-p.X > 0 ? 1 : -1, corner = dir > 1 ? 7 : 0;
+            int dir = x-p.X > 0 ? 1 : -1, corner = dir > 0 ? 7 : 0;
             Rook r = (Rook)Board[corner,y]!;
             Move rookMove = new(Turns, x-dir, y);
 
@@ -61,39 +76,72 @@ class Game {
 
         return true;
     }
-    private void BaseBoard() 
+    
+    public bool[,,] GetAttackedSpaces() 
     {
-        // Setup Pawns
-        for(int i = 0; i < 8; i++) {
-            Board[i,1] = new Pawn(ColorEnum.Black, i, 1);
-            Board[i,6] = new Pawn(ColorEnum.White, i, 6);
+        bool[,,] AttackedSpaces = new bool[Enum.GetNames(typeof(ColorEnum)).Length, 8, 8];
+
+        foreach(ColorEnum color in (ColorEnum[])Enum.GetValues(typeof(ColorEnum))) {
+            for(int i = 0; i < 8; i++)
+            for(int j = 0; j < 8; j++)
+                AttackedSpaces[(int)color, i, j] = false;
+
+            foreach(APiece? p in Board) 
+                if(p != null && p.Color == color)
+                    for(int y = 0; y < 8; y++)
+                    for(int x = 0; x < 8; x++) {
+                        if(CheckMove(p, x, y, false))
+                            AttackedSpaces[(int)color, x, y] = true;
+                            
+                    }
         }
-        
-        // Black Pieces
-        Board[0,0] = new Rook(ColorEnum.Black, 0, 0);
-        Board[1,0] = new Knight(ColorEnum.Black, 1, 0);
-        Board[2,0] = new Bishop(ColorEnum.Black, 2, 0);
-        Board[3,0] = new King(ColorEnum.Black, 3, 0);
-        Board[4,0] = new Queen(ColorEnum.Black, 4, 0);
-        Board[5,0] = new Bishop(ColorEnum.Black, 5, 0);
-        Board[6,0] = new Knight(ColorEnum.Black, 6, 0);
-        Board[7,0] = new Rook(ColorEnum.Black, 7, 0);
-        
-        // White Pieces
-        Board[0,7] = new Rook(ColorEnum.White, 0, 7);
-        Board[1,7] = new Knight(ColorEnum.White, 1, 7);
-        Board[2,7] = new Bishop(ColorEnum.White, 2, 7);
-        Board[3,7] = new Queen(ColorEnum.White, 3, 7);
-        Board[4,7] = new King(ColorEnum.White, 4, 7);
-        Board[5,7] = new Bishop(ColorEnum.White, 5, 7);
-        Board[6,7] = new Knight(ColorEnum.White, 6, 7);
-        Board[7,7] = new Rook(ColorEnum.White, 7, 7);
+        return AttackedSpaces;
 
     }
+    
+    public void Print() 
+    {
+        int columnWidth = 6;
+        for (int y = 0; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                APiece? p = Board[x, y];
+                string className = (p != null) ? p.Name.ToString() : "";
+
+                // Calculate the padding required on both sides of the class name
+                int leftPadding = (columnWidth - className.Length) / 2;
+                int rightPadding = columnWidth - className.Length - leftPadding;
+
+                // Pad the class name with spaces on both sides to center it
+                string centeredClassName = "[" + className.PadLeft(leftPadding + className.Length).PadRight(columnWidth) + "]";
+
+                Console.Write(centeredClassName + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+    
+    public string ToString() 
+    {
+        string s = "";
+        for (int y = 0; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                APiece? p = Board[x, y];
+                string className = (p != null) ? p.Name.ToString() : "";
+                s += className + " | ";
+            }
+            s += "\n";
+        }
+        return s;
+    }
+    
     private bool CheckMove(APiece p, int x, int y, bool attack=false) 
     {
         // Helper functions
-        bool checkDiag() {
+        bool CheckDiag() {
             int xDif = x-p.X, yDif = y-p.Y;
             int xDir = xDif > 0 ? 1 : -1, yDir = yDif > 0 ? 1 : -1;
 
@@ -101,7 +149,7 @@ class Game {
                 if(Board[p.X+i*xDir,p.Y+i*yDir] != null) return false;
             return true;
         }
-        bool checkStraight() {
+        bool CheckStraight() {
             if(p.X != x) {
                 int dif = x-p.X;
                 int dir = dif > 0 ? 1 : -1;
@@ -160,21 +208,22 @@ class Game {
 
             case PieceEnum.Rook:
             
-                return checkStraight();
+                return CheckStraight();
 
             case PieceEnum.Bishop:
 
-                return checkDiag();
+                return CheckDiag();
             
             case PieceEnum.Queen:
 
-                if(x != p.X && y != p.Y) return checkDiag();
-                return checkStraight();
+                if(x != p.X && y != p.Y) return CheckDiag();
+                return CheckStraight();
 
         }
 
         return false;
     }
+    
     private bool CheckEnPassant(APiece p, int x, int y) 
     {
         if(!(p is Pawn)) return false;
@@ -187,6 +236,7 @@ class Game {
                 Board[x,p.Y]?.Positions[1].Turn == Turns-1;                     // Checks if the pawn moved the previous turn
         
     }
+    
     private bool CheckCastle(APiece p, int x, int y) 
     {
         if((!(p is King))   || 
@@ -206,11 +256,13 @@ class Game {
         
         return false;
     }
+    
     private bool CheckPromotion(APiece p, int x, int y) 
     {
         if(!CheckMove(p,x,y)) return false;
         return (p is Pawn && ((p.Color == ColorEnum.Black && y == 7) || (p.Color == ColorEnum.White && y == 0)));
     }
+    
     private bool IsAttacked(ColorEnum friendlyColor, int x, int y) 
     {
         foreach(APiece attacker in Pieces) {                      // Loops through AttackedSpaces to make sure King is not moving into an attacked space
@@ -219,6 +271,7 @@ class Game {
         }
         return false;
     }
+    
     private APiece Promote(Pawn p) 
     {       
         //
@@ -230,48 +283,37 @@ class Game {
 
         return promotedPiece;
     }
-    public bool[,,] GetAttackedSpaces() 
+    
+    public static APiece[,] BaseBoard()
     {
-        bool[,,] AttackedSpaces = new bool[Enum.GetNames(typeof(ColorEnum)).Length, 8, 8];
-
-        foreach(ColorEnum color in (ColorEnum[])Enum.GetValues(typeof(ColorEnum))) {
-            for(int i = 0; i < 8; i++)
-                for(int j = 0; j < 8; j++)
-                    AttackedSpaces[(int)color, i, j] = false;
-
-            foreach(APiece? p in Board) 
-                if(p != null && p.Color == color)
-                    for(int y = 0; y < 8; y++)
-                        for(int x = 0; x < 8; x++) {
-                            if(CheckMove(p, x, y, false))
-                                AttackedSpaces[(int)color, x, y] = true;
-                            
-                        }
+        APiece?[,] ret = new APiece[8, 8];
+        // Setup Pawns
+        for(int i = 0; i < 8; i++) {
+            ret[i,1] = new Pawn(ColorEnum.Black, i, 1);
+            ret[i,6] = new Pawn(ColorEnum.White, i, 6);
         }
-        return AttackedSpaces;
+        
+        // Black Pieces
+        ret[0,0] = new Rook(ColorEnum.Black, 0, 0);
+        ret[1,0] = new Knight(ColorEnum.Black, 1, 0);
+        ret[2,0] = new Bishop(ColorEnum.Black, 2, 0);
+        ret[3,0] = new King(ColorEnum.Black, 3, 0);
+        ret[4,0] = new Queen(ColorEnum.Black, 4, 0);
+        ret[5,0] = new Bishop(ColorEnum.Black, 5, 0);
+        ret[6,0] = new Knight(ColorEnum.Black, 6, 0);
+        ret[7,0] = new Rook(ColorEnum.Black, 7, 0);
+        
+        // White Pieces
+        ret[0,7] = new Rook(ColorEnum.White, 0, 7);
+        ret[1,7] = new Knight(ColorEnum.White, 1, 7);
+        ret[2,7] = new Bishop(ColorEnum.White, 2, 7);
+        ret[3,7] = new Queen(ColorEnum.White, 3, 7);
+        ret[4,7] = new King(ColorEnum.White, 4, 7);
+        ret[5,7] = new Bishop(ColorEnum.White, 5, 7);
+        ret[6,7] = new Knight(ColorEnum.White, 6, 7);
+        ret[7,7] = new Rook(ColorEnum.White, 7, 7);
 
-    }
-    public void Print() 
-    {
-        int columnWidth = 6;
-        for (int y = 0; y < 8; y++)
-        {
-            for (int x = 0; x < 8; x++)
-            {
-                APiece? p = Board[x, y];
-                string className = (p != null) ? p.Name.ToString() : "";
-
-                // Calculate the padding required on both sides of the class name
-                int leftPadding = (columnWidth - className.Length) / 2;
-                int rightPadding = columnWidth - className.Length - leftPadding;
-
-                // Pad the class name with spaces on both sides to center it
-                string centeredClassName = "[" + className.PadLeft(leftPadding + className.Length).PadRight(columnWidth) + "]";
-
-                Console.Write(centeredClassName + " ");
-            }
-            Console.WriteLine();
-        }
+        return ret;
     }
 
 }

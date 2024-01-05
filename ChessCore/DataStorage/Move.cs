@@ -1,8 +1,8 @@
-using Chess.Game.PieceSetup;
+using ChessCore.PieceSetup;
 
-namespace Chess.Game.DataStorage;
+namespace ChessCore.DataStorage;
 
-class Move {
+public class Move {
     public int Turn;
     public int X;
     public int Y;

@@ -1,9 +1,9 @@
 using System;
-using Chess.Game.PieceSetup;
+using ChessCore.PieceSetup;
 
-namespace Chess.Game.PieceSetup.Pieces;
+namespace ChessCore.PieceSetup.Pieces;
 
-class Bishop : APiece 
+public class Bishop : APiece 
 {
     private static int BlackCount;
     private static int WhiteCount;
@@ -14,6 +14,7 @@ class Bishop : APiece
         Id = color == ColorEnum.White ? ++WhiteCount : ++BlackCount;
         Name = PieceEnum.Bishop;
     }
+    public Bishop(ColorEnum color) : this(color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         if(x > 7 || x < 0 || y < 0 || y > 7 || (X == x && Y == y)) return false;

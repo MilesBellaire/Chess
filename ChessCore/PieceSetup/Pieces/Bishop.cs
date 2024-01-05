@@ -14,7 +14,11 @@ public class Bishop : APiece
         Id = color == ColorEnum.White ? ++WhiteCount : ++BlackCount;
         Name = PieceEnum.Bishop;
     }
+    public Bishop(int color, int x, int y) : this((ColorEnum)color, x, y) {}
+    
     public Bishop(ColorEnum color) : this(color, 0, 0) {}
+    
+    public Bishop(int color) : this((ColorEnum)color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         if(x > 7 || x < 0 || y < 0 || y > 7 || (X == x && Y == y)) return false;

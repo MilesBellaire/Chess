@@ -48,7 +48,7 @@ public class Game {
     
     public bool Go(APiece? p, int x, int y) 
     {
-        if(p is null || Pieces.Contains(p) || p.Color != Turn) return false;
+        if(p is null || !Pieces.Contains(p) || p.Color != Turn) return false;
         // Handle conditions before moving piece
         if(!CheckMove(p, x, y)) return false;
         
@@ -73,8 +73,15 @@ public class Game {
 
         GetAttackedSpaces();
         Turns++;
+        
+        Turn = (Turn == ColorEnum.Black) ? ColorEnum.White : ColorEnum.Black;
 
         return true;
+    }
+    
+    public bool Go(int pieceX, int pieceY, int x, int y) 
+    {
+        return Go(Board[pieceX, pieceY], x, y);
     }
     
     public bool[,,] GetAttackedSpaces() 
@@ -106,7 +113,7 @@ public class Game {
         {
             for (int x = 0; x < 8; x++)
             {
-                APiece? p = Board[x, y];
+                APiece? p = Board[y, x];
                 string className = (p != null) ? p.Name.ToString() : "";
 
                 // Calculate the padding required on both sides of the class name

@@ -15,7 +15,11 @@ public class Pawn : APiece
         Name = PieceEnum.Pawn;
     }
     
+    public Pawn(int color, int x, int y) : this((ColorEnum)color, x, y) {}
+    
     public Pawn(ColorEnum color) : this(color, 0, 0) {}
+    
+    public Pawn(int color) : this((ColorEnum)color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         int dir = Color == ColorEnum.Black ? 1 : -1;

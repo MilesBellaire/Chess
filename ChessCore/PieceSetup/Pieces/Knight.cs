@@ -13,7 +13,11 @@ public class Knight : APiece
         Id = color == ColorEnum.White ? ++WhiteCount : ++BlackCount;
         Name = PieceEnum.Knight;
     }
+    
+    public Knight(int color, int x, int y) : this((ColorEnum)color, x, y) {}
     public Knight(ColorEnum color) : this(color, 0, 0) {}
+    
+    public Knight(int color) : this((ColorEnum)color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         if(x > 7 || x < 0 || y < 0 || y > 7) return false;

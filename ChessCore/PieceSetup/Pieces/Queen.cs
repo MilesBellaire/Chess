@@ -14,7 +14,11 @@ public class Queen : APiece
         Id = color == ColorEnum.White ? ++WhiteCount : ++BlackCount;
         Name = PieceEnum.Queen;
     }
+    
+    public Queen(int color, int x, int y) : this((ColorEnum)color, x, y) {}
     public Queen(ColorEnum color) : this(color, 0, 0) {}
+    
+    public Queen(int color) : this((ColorEnum)color, 0, 0) {}
     public override bool IsMove(int x, int y) 
     {
         if(x > 7 || x < 0 || y < 0 || y > 7 || (X == x && Y == y)) return false;

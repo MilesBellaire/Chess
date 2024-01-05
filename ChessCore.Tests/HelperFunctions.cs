@@ -5,16 +5,16 @@ namespace ChessCore.Tests;
 
 public static class HelperFunctions
 {
+    private static bool BoardEquals(APiece? p1, APiece? p2) => (
+        (p1 is null && p2 is null) || 
+        (p1 is not null && p2 is not null && p1.ToString() == p2.ToString())
+    );
     public static bool CompareBoards(APiece?[,] board1, APiece?[,] board2)
     {
-        bool Equal(APiece? p1, APiece? p2) => (
-            (p1 is null && p2 is null) || 
-            (p1 is not null && p2 is not null && p1.ToString() == p2.ToString())
-        );
         
         for(int y = 0; y < 8; y++)
             for(int x = 0; x < 8; x++)
-                if(!Equal(board1[x,y], board2[x,y]))
+                if(!BoardEquals(board1[x,y], board2[x,y]))
                     return false;
         
         return true;
@@ -39,10 +39,14 @@ public static class HelperFunctions
         {
             for (int x = 0; x < 8; x++)
             {
-                ret += $"[{(board1[y, x] == board2[y, x] ? ' ' : 'X')}] ";
-                if (board1[y, x] != board2[y, x])
+                if (!BoardEquals(board1[y, x], board2[y, x]))
                 {
+                    ret += "[X] ";
                     append += $"{board1[y, x]} != {board2[y, x]}\n";
+                }
+                else
+                {
+                    ret += "[ ] ";
                 }
             }
             ret += '\n';
